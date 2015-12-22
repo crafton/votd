@@ -6,10 +6,14 @@ lazy val `votd` = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.11.7"
 
+routesGenerator := InjectedRoutesGenerator
+
 libraryDependencies ++= Seq( jdbc , cache , ws   , specs2 % Test,
-    "postgresql" % "postgresql" % "9.1-901-1.jdbc4" ,
-    "com.typesafe.play" %% "play-slick" % "1.1.1" )
+    "org.postgresql" % "postgresql" % "9.4-1205-jdbc42",
+    "com.typesafe.play" %% "play-slick" % "1.1.1",
+    "com.adrianhurt" %% "play-bootstrap" % "1.0-P24-B3-SNAPSHOT" )
 
 unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )  
 
-resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"  
+resolvers ++= Seq ("scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
+                   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/" )

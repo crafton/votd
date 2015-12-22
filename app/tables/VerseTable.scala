@@ -1,6 +1,6 @@
 package tables
 
-import models.Verse
+import models.votd.Verse
 import slick.driver.JdbcProfile
 
 /**
@@ -10,12 +10,13 @@ trait VerseTable {
 
     protected val driver: JdbcProfile
     import driver.api._
-    class Verses(tag: Tag) extends Table[Verse](tag, "VERSES") {
+    class Verses(tag: Tag) extends Table[Verse](tag, "verse") {
+
         def book = column[String]("book")
         def chapter = column[Int]("chapter")
         def verseNumber = column[Int]("versenumber")
 
-        def * : (book, chapter, verseNumber) <> (Verse.tupled, Verse.unapply _)
+        def * = (book, chapter, verseNumber) <> (Verse.tupled, Verse.unapply _)
     }
 
 }

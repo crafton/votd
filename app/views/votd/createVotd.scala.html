@@ -1,0 +1,14 @@
+@(votdForm: Form[models.votd.VotdFormData])(implicit messages: Messages)
+
+@import b3.vertical.fieldConstructor
+
+@views.html.main ("Create Verse of the Day") {
+
+    @b3.form(routes.Votds.create) {
+        @b3.text(votdForm("versestart"), '_label -> "Verse Start", 'placeholder -> "1 John 1")
+        @b3.text(votdForm("verseend"), '_label -> "Verse End", 'placeholder -> "1 John 2")
+        @b3.text(votdForm("themes"), '_label -> "Themes", 'placeholder -> "love, faith, kindness")
+        @b3.submit('class -> "btn btn-default"){Save}
+    }
+
+}

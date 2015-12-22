@@ -1,4 +1,4 @@
-package models
+package models.votd
 
 /**
   * Created by Crafton Williams on 13/12/2015.

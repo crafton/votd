@@ -1,7 +1,13 @@
-@(message: String)
+@import models.votd.Verse
+@(verses: List[Verse])
 
-@main("Welcome to Play") {
+@main("Bible Verses") {
 
-    @play20.welcome(message)
+    <table>
+        <tr><th>Book</th><th>Chapter</th></tr>
+        @for(verse <- verses ){
+            <tr><td>@verse.book</td><td>@verse.chapter</td></tr>
+        }
+    </table>
 
 }
