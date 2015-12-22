@@ -1,12 +1,12 @@
 logs
 project/project
 project/target
-project/conf/application.conf
 target
 tmp
 .history
 dist
 /.idea
+/conf/application.conf
 /*.iml
 /out
 /.idea_modules
