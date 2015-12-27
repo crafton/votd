@@ -1,24 +1,16 @@
 package controllers
 
-import models.votd.Verse
-import play.api._
-import play.api.data.Form
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfig}
-import play.api.mvc._
-import slick.driver.JdbcProfile
-import tables.VerseTable
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.i18n.{ MessagesApi, I18nSupport }
+import javax.inject.Inject
 
-object Application extends Controller with VerseTable with HasDatabaseConfig[JdbcProfile] {
+import play.api.mvc.{Action, Controller}
 
-  val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
-  import driver.api._
+class Application @Inject() (val messagesApi: MessagesApi) extends Controller with I18nSupport {
 
-  //Create instance of the verses table
-  val Verses = TableQuery[Verses]
 
-  def index = Action.async { implicit request =>
-    dbConfig.db.run(Verses.filter(_.book like "%John%").result).map(res => Ok(views.html.index(res.toList)))
+  def index = Action { implicit request =>
+     Ok(views.html.index("Hello World!"))
   }
 
 }

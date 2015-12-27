@@ -9,7 +9,7 @@ GET     /                           controllers.Application.index
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 # VOTD
-GET    /votd/create               @controllers.Votds.create
+GET    /votd/create                controllers.Votds.create
 #POST   /votd/save                 controllers.Votds.save
 
     

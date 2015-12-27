@@ -26,7 +26,7 @@ class Votds @Inject()(val messagesApi: MessagesApi) extends Controller with I18n
 
   def index = ???
 
-  def create = Action {
+  def create = Action { implicit request =>
     Ok(views.html.votd.createVotd(votdForm))
   }
 
