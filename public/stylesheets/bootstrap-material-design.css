@@ -126,6 +126,7 @@ body .container .jumbotron p,
 body .container-fluid .jumbotron p {
   font-weight: 300;
 }
+
 body .container .well,
 body .container-fluid .well,
 body .container .jumbotron,
@@ -3368,3 +3369,17 @@ hr.on-light {
   pointer-events: none;
   color: #757575;
 }
+
+/*Mods*/
+body .container-fluid .well {
+  margin-top: 50px;
+  margin-left: 175px;
+  margin-right: 175px;
+}
+
+.form-horizontal {
+  margin-left: 50px;
+}
+
+
+/*# sourceMappingURL=bootstrap-material-design.css.map */
