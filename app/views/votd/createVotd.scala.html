@@ -7,12 +7,15 @@
     <div class="well">
         <h1>Create New VOTD</h1>
             @b3.form(routes.Votds.create) {
-                @b3.text(votdForm("versestart"), '_label -> "Verse Start", 'placeholder -> "1+John+1:2")
-                @b3.text(votdForm("verseend"), '_label -> "Verse End", 'placeholder -> "1+John+1:3")
+                @b3.text(votdForm("versestart"), '_label -> "Verse Start", 'placeholder -> "1 John 1:2")
+                @b3.text(votdForm("verseend"), '_label -> "Verse End", 'placeholder -> "1 John 1:3")
                 @b3.text(votdForm("themes"), '_label -> "Themes", 'placeholder -> "love, faith, kindness")
-                @b3.submit('class -> "btn btn-primary"){Continue}
-    }
-        @b3.free(){<button id="retrieveverse" data-toggle="modal" data-target="#versemodal" class="btn btn-default">Get External Content</button>}
+                @b3.free(){
+                    <button type="button" id="button_retrieveverse" data-toggle="modal" data-target="#versemodal" class="btn btn-default">Continue</button>
+                    <button type="submit" id="button_submitform" class="btn btn-primary">Save</button>
+                }
+            }
+
     </div>
     <div id="versemodal" class="modal fade" style="display: none">
         <div class="modal-dialog">
@@ -21,32 +24,52 @@
                     <button class="close" aria-hidden="true" type="button" data-dismiss="modal">×</button>
                     <h4 class="modal-title">Verse(s) Retrieved....is this right?</h4>
                 </div>
+                <div id="loadingDiv" class="modal-body"><i class="fa fa-cog fa-spin"></i></div>
                 <div id=verseretrieved class="modal-body">
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>
-                    <button class="btn btn-primary" type="button">Save changes</button>
+                    <button id="button_no" class="btn btn-danger" type="button" data-dismiss="modal">No</button>
+                    <button id="button_yes" class="btn btn-primary" type="button" data-dismiss="modal">Yes</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-            $("#retrieveverse").click(function(){
+            //Retrieve the verses
+            $("#button_retrieveverse").click(function(){
                 $.ajax({
-                    url: "/votd/getverse",
+                    url: "/votd/getverse/"+$("#versestart").val()+"/"+$("#verseend").val(),
                     cache: false,
-                    data: {
-                        versestart: "",
-                        verseend: ""
-                    },
                     success: function( data ) {
-                        $( "#verseretrieved" ).html( "<strong>" + data + "</strong> " );
+                        $( "#verseretrieved" ).html( data );
                     },
                     error: function(errorThrown){
-                        console.error(errorThrown)
+                        $( "#verseretrieved" ).html( "<strong>Couldn't retrieve any matching verses.</strong> " );
+                        $("#button_yes").hide()
                     }
                 });
             });
+
+            //Show a nice loader when verses are being retrieved
+            jQuery.ajaxSetup({
+                beforeSend: function() {
+                    $('#loadingDiv').show();
+                },
+                complete: function(){
+                    $('#loadingDiv').hide();
+                },
+                success: function() {}
+            });
+
+
+            //Guide user to validate verses before saving
+            $("#button_submitform").hide()
+            $("#button_no").click(function(){
+                $("#button_submitform").hide()
+            })
+            $("#button_yes").click(function(){
+                $("#button_submitform").show()
+            })
     </script>
 }

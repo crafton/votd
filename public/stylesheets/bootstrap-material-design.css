@@ -3381,5 +3381,10 @@ body .container-fluid .well {
   margin-left: 50px;
 }
 
+#loadingDiv {
+  width: 100px;
+  height: 100px;
+  margin: auto;
+}
 
 /*# sourceMappingURL=bootstrap-material-design.css.map */

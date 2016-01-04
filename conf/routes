@@ -3,14 +3,14 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
+GET     /                                                controllers.Application.index
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET     /assets/*file                                    controllers.Assets.at(path="/public", file)
 
 # VOTD
-GET    /votd/create                controllers.Votds.create
-GET    /votd/getverse              controllers.Votds.getVerse
+GET    /votd/create                                      controllers.Votds.create
+GET    /votd/getverse/:verseStart/:verseEnd              controllers.Votds.getVerse(verseStart: String, verseEnd: String)
 #POST   /votd/save                 controllers.Votds.save
 
     

@@ -32,7 +32,7 @@ class Votds @Inject()(val messagesApi: MessagesApi, ws: WSClient) extends Contro
     mapping (
     "versestart" -> nonEmptyText,
     "verseend" -> nonEmptyText,
-    "themes" -> nonEmptyText
+    "themes" -> text
     )(VotdFormData.apply)(VotdFormData.unapply)
   )
 
@@ -44,8 +44,8 @@ class Votds @Inject()(val messagesApi: MessagesApi, ws: WSClient) extends Contro
     Ok(views.html.votd.createVotd(votdForm))
   }
 
-  def getVerse = Action.async {
-    ws.url("https://bibles.org/v2/passages.js?q[]=Matthew+6:24-Matthew+6:26&version=eng-ESV")
+  def getVerse(verseStart: String, verseEnd: String) = Action.async {
+    ws.url(s"https://bibles.org/v2/passages.js?q[]=$verseStart-$verseEnd&version=eng-ESV")
     .withAuth(apiKey.get, "", WSAuthScheme.BASIC)
     .get().map { response =>
       Ok(((response.json \ "response" \ "search" \ "result" \ "passages")(0) \ "text").as[String])
