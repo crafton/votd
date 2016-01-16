@@ -2,37 +2,34 @@ package controllers
 
 import javax.inject.Inject
 
-import models.votd.{VotdFormData, Votd}
+import Utility.VerseUtils
+import models.votd.VotdFormData
 import play.api._
-import play.api.db.slick.{HasDatabaseConfig, HasDatabaseConfigProvider, DatabaseConfigProvider}
-import play.api.i18n.{MessagesApi, I18nSupport}
-import play.api.libs.ws._
-import play.api.mvc._
-import play.api.data._
-import play.api.data.Forms._
 import play.api.data.Form
+import play.api.data.Forms._
+import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfig}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.libs.ws._
 import play.api.mvc.{Action, Controller}
-import slick.driver
 import slick.driver.JdbcProfile
 import tables.VerseTable
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.Logger
+import views.html.defaultpages.notFound
 
-import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 /**
   * Created by craft on 19/12/2015.
   */
-class Votds @Inject()(val messagesApi: MessagesApi, ws: WSClient) extends Controller with I18nSupport with VerseTable with HasDatabaseConfig[JdbcProfile]{
+class Votds @Inject()(val messagesApi: MessagesApi, ws: WSClient) extends Controller with I18nSupport with VerseTable with HasDatabaseConfig[JdbcProfile] {
 
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
-  import driver.api._
 
-  val votdForm = Form (
-    mapping (
-    "versestart" -> nonEmptyText,
-    "verseend" -> nonEmptyText,
-    "themes" -> text
+  val votdForm = Form(
+    mapping(
+      "verses" -> nonEmptyText,
+      "themes" -> optional(text)
     )(VotdFormData.apply)(VotdFormData.unapply)
   )
 
@@ -44,27 +41,39 @@ class Votds @Inject()(val messagesApi: MessagesApi, ws: WSClient) extends Contro
     Ok(views.html.votd.createVotd(votdForm))
   }
 
-  def getVerse(verseStart: String, verseEnd: String) = Action.async {
-    ws.url(s"https://bibles.org/v2/passages.js?q[]=$verseStart-$verseEnd&version=eng-ESV")
-    .withAuth(apiKey.get, "", WSAuthScheme.BASIC)
-    .get().map { response =>
-      Ok(((response.json \ "response" \ "search" \ "result" \ "passages")(0) \ "text").as[String])
+  def getVerse(verses: String) = Action.async {
+
+    val versesTrimmed: String = verses.trim
+
+    val maxVerses: Int = Play.current.configuration.getInt("verses.max").get //this needs to be checked at bootstrap
+    val verseLength = VerseUtils.getVerseLength(versesTrimmed).getOrElse(0)
+
+    if (verseLength == 0) {
+      Logger.warn("Apparently an integer was not used for the verse number")
     }
-    /*val futureResponse: Future[WSResponse] = request.get()
 
-    val futureResult = futureResponse.map{response => response.xml \ "response"}
+    if (verseLength > maxVerses) {
+      Logger.warn(s"You tried to retrieve $verseLength verses but the maximum is $maxVerses.")
+      Future {
+        BadRequest(s"Maximum number of verses exceeded. You can select only a maximum of $maxVerses verses.")
+      }
+    } else {
+      ws.url(s"https://bibles.org/v2/passages.js?q[]=$versesTrimmed&version=eng-ESV")
+        .withAuth(apiKey.get, "", WSAuthScheme.BASIC)
+        .get().map { response =>
+        Ok("<h3>" + ((response.json \ "response" \ "search" \ "result" \ "passages") (0) \ "display").as[String] +
+          "</h3>" + ((response.json \ "response" \ "search" \ "result" \ "passages") (0) \ "text").as[String])
+      }
+    }
 
-    val result = Await.result(futureResult, 15 seconds)
-
-    Ok(result)*/
   }
 
-/*  def save = Action { implicit request =>
-    formMapping.bindFromRequest.fold(
-      errors => BadRequest(views.html.votd.createVotd)
-      votd => Ok(views.html.votd.createVotd)
-    )
-  }*/
+  /*  def save = Action { implicit request =>
+      formMapping.bindFromRequest.fold(
+        errors => BadRequest(views.html.votd.createVotd)
+        votd => Ok(views.html.votd.createVotd)
+      )
+    }*/
 
   def update = ???
 
