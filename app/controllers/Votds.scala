@@ -1,5 +1,6 @@
 package controllers
 
+import java.util.regex.Pattern
 import javax.inject.Inject
 
 import Utility.VerseUtils
@@ -15,7 +16,7 @@ import play.api.mvc.{Action, Controller}
 import slick.driver.JdbcProfile
 import tables.VerseTable
 import play.Logger
-import views.html.defaultpages.notFound
+import play.api.data.validation.Constraints._
 
 import scala.concurrent.Future
 
@@ -28,7 +29,7 @@ class Votds @Inject()(val messagesApi: MessagesApi, ws: WSClient) extends Contro
 
   val votdForm = Form(
     mapping(
-      "verses" -> nonEmptyText,
+      "verses" -> nonEmptyText.verifying(pattern("(\\d\\s)?\\w+\\s(\\d{1,2}):(\\d{1,3})(\\s?-\\s?\\d{1,3})?".r)),
       "themes" -> optional(text)
     )(VotdFormData.apply)(VotdFormData.unapply)
   )
@@ -46,16 +47,12 @@ class Votds @Inject()(val messagesApi: MessagesApi, ws: WSClient) extends Contro
     val versesTrimmed: String = verses.trim
 
     val maxVerses: Int = Play.current.configuration.getInt("verses.max").get //this needs to be checked at bootstrap
-    val verseLength = VerseUtils.getVerseLength(versesTrimmed).getOrElse(0)
+    val validationResult = VerseUtils.validateVerseLength(versesTrimmed)
 
-    if (verseLength == 0) {
-      Logger.warn("Apparently an integer was not used for the verse number")
-    }
-
-    if (verseLength > maxVerses) {
-      Logger.warn(s"You tried to retrieve $verseLength verses but the maximum is $maxVerses.")
+    if (validationResult.isDefined) {
       Future {
-        BadRequest(s"Maximum number of verses exceeded. You can select only a maximum of $maxVerses verses.")
+        Logger.warn(validationResult.get)
+        BadRequest(validationResult.get)
       }
     } else {
       ws.url(s"https://bibles.org/v2/passages.js?q[]=$versesTrimmed&version=eng-ESV")
@@ -65,7 +62,6 @@ class Votds @Inject()(val messagesApi: MessagesApi, ws: WSClient) extends Contro
           "</h3>" + ((response.json \ "response" \ "search" \ "result" \ "passages") (0) \ "text").as[String])
       }
     }
-
   }
 
   /*  def save = Action { implicit request =>

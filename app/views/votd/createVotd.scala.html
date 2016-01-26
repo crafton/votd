@@ -1,19 +1,22 @@
 @(votdForm: Form[models.votd.VotdFormData])(implicit messages: Messages)
 
-@implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-2", "col-md-8") }
+@implicitFieldConstructor = @{
+    b3.horizontal.fieldConstructor("col-md-2", "col-md-8")
+}
 
 @main("Create Verse of the Day") {
 
     <div class="well">
         <h1>Create New VOTD</h1>
-            @b3.form(routes.Votds.create) {
-                @b3.text(votdForm("verses"), '_label -> "Verses", 'placeholder -> "1 John 1:2-4")
-                @b3.text(votdForm("themes"), '_label -> "Themes", 'placeholder -> "love, faith, kindness")
-                @b3.free(){
-                    <button type="button" id="button_retrieveverse" data-toggle="modal" data-target="#versemodal" class="btn btn-default">Continue</button>
-                    <button type="submit" id="button_submitform" class="btn btn-primary">Save</button>
-                }
+        @b3.form(routes.Votds.create) {
+            @b3.text(votdForm("verses"), '_label -> "Verses", 'placeholder -> "1 John 1:2-4")
+            @b3.text(votdForm("themes"), '_label -> "Themes", 'placeholder -> "love, faith, kindness")
+            @b3.free() {
+                <button type="button" id="button_retrieveverse" data-toggle="modal" data-target="#versemodal" class="btn btn-default">
+                    Continue</button>
+                <button type="submit" id="button_submitform" class="btn btn-primary">Save</button>
             }
+        }
 
     </div>
     <div id="versemodal" class="modal fade" style="display: none">
@@ -37,19 +40,20 @@
     <script>
             //Retrieve the verses
             $("#button_retrieveverse").click(function(){
-                $.ajax({
-                    url: "/votd/getverse/"+$("#verses").val(),
-                    cache: false,
-                    success: function( data ) {
-                        $( "#verseretrieved" ).html( data );
-                        $("#button_yes").show()
-                    },
-                    error: function(xhr, status, errorThrown){
-                        $( "#verseretrieved" ).html( "<strong>"+xhr.responseText+"</strong> " );
-                        $("#button_yes").hide()
-                    }
-                });
+                    $.ajax({
+                        url: "/votd/getverse/"+$("#verses").val(),
+                        cache: false,
+                        success: function( data ) {
+                            $( "#verseretrieved" ).html( data );
+                            $("#button_yes").show()
+                        },
+                        error: function(xhr, status, errorThrown){
+                            $( "#verseretrieved" ).html( "<strong>"+xhr.responseText+"</strong> " );
+                            $("#button_yes").hide()
+                        }
+                    });
             });
+
 
             //Show a nice loader when verses are being retrieved
             jQuery.ajaxSetup({

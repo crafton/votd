@@ -10,7 +10,8 @@ GET     /assets/*file                                    controllers.Assets.at(p
 
 # VOTD
 GET    /votd/create                                      controllers.Votds.create
-GET    /votd/getverse/:verseStart             controllers.Votds.getVerse(verseStart: String)
+GET    /votd/getverse/:verseStart                        controllers.Votds.getVerse(verseStart: String)
+GET    /votd/getverse/                                   controllers.Votds.getVerse(verseStart: String ?="")
 #POST   /votd/save                 controllers.Votds.save
 
     
